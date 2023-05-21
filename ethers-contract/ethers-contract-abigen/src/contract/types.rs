@@ -1,5 +1,7 @@
 //! Types expansion
 
+use std::collections::HashMap;
+
 use crate::{util, InternalStructs};
 use ethers_core::{
     abi::{struct_def::StructFieldType, Event, EventParam, Param, ParamType},
@@ -160,14 +162,27 @@ fn expand_resolved<'a, 'b, F: Fn(&'a Param) -> Option<&'b str>>(
 }
 
 /// Expands to the Rust struct type.
-pub(crate) fn expand_struct_type(struct_ty: &StructFieldType) -> TokenStream {
+pub(crate) fn expand_struct_type(
+    struct_ty: &StructFieldType,
+    rust_type_names: &HashMap<String, String>,
+) -> TokenStream {
+    let id = struct_ty.identifier();
     match struct_ty {
         StructFieldType::Type(ty) => {
-            let ty = util::ident(&ty.name().to_pascal_case());
+            let ty = util::ident(
+                &rust_type_names
+                    .get(&id)
+                    .map(|s| s.as_str())
+                    // this feels like a hack but it works
+                    .unwrap_or(ty.name())
+                    .to_pascal_case(),
+            );
             quote!(#ty)
         }
-        StructFieldType::Array(ty) => array(expand_struct_type(ty), None),
-        StructFieldType::FixedArray(ty, size) => array(expand_struct_type(ty), Some(*size)),
+        StructFieldType::Array(ty) => array(expand_struct_type(ty, rust_type_names), None),
+        StructFieldType::FixedArray(ty, size) => {
+            array(expand_struct_type(ty, rust_type_names), Some(*size))
+        }
     }
 }
 

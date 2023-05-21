@@ -93,7 +93,9 @@ impl Context {
         for field in sol_struct.fields() {
             let ty = match field.r#type() {
                 FieldType::Elementary(ty) => types::expand(ty)?,
-                FieldType::Struct(struct_ty) => types::expand_struct_type(struct_ty),
+                FieldType::Struct(struct_ty) => {
+                    types::expand_struct_type(struct_ty, &self.internal_structs.rust_type_names)
+                }
                 FieldType::Mapping(_) => {
                     eyre::bail!("Mapping types in struct `{name}` are not supported")
                 }
@@ -141,7 +143,10 @@ impl Context {
                     fields.push(quote! { pub #field_name: #ty });
                 }
                 FieldType::Struct(struct_ty) => {
-                    let ty = types::expand_struct_type(struct_ty);
+                    let ty = types::expand_struct_type(
+                        struct_ty,
+                        &self.internal_structs.rust_type_names,
+                    );
                     fields.push(quote! { pub #field_name: #ty });
 
                     let name = struct_ty.name();
