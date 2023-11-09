@@ -11,11 +11,17 @@ pub enum ParseError {
     #[error("{0}")]
     Message(String),
     // ethabi parser error
-    #[error(transparent)]
-    ParseError(#[from] ethabi::Error),
+    #[error("{0:?}")]
+    ParseError(ethabi::Error),
     // errors from human readable lexer
     #[error(transparent)]
     LexerError(#[from] human_readable::lexer::LexerError),
+}
+
+impl From<ethabi::Error> for ParseError {
+    fn from(value: ethabi::Error) -> Self {
+        Self::ParseError(value)
+    }
 }
 
 macro_rules! _format_err {
@@ -35,8 +41,8 @@ pub(crate) use _bail as bail;
 #[derive(Error, Debug)]
 pub enum AbiError {
     /// Thrown when the ABI decoding fails
-    #[error(transparent)]
-    DecodingError(#[from] ethabi::Error),
+    #[error("{0:?}")]
+    DecodingError(ethabi::Error),
 
     /// Thrown when detokenizing an argument
     #[error(transparent)]
@@ -47,4 +53,10 @@ pub enum AbiError {
 
     #[error(transparent)]
     ParseBytesError(#[from] ParseBytesError),
+}
+
+impl From<ethabi::Error> for AbiError {
+    fn from(value: ethabi::Error) -> Self {
+        Self::DecodingError(value)
+    }
 }

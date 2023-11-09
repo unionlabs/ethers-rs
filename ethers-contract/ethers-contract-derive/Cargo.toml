@@ -33,6 +33,7 @@ hex.workspace = true
 serde_json.workspace = true
 
 [features]
-default = ["providers"]
+default = ["providers", "eip712"]
 
 providers = ["ethers-contract-abigen/providers"]
+eip712 = []

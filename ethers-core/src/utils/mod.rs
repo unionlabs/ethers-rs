@@ -74,8 +74,8 @@ pub enum ConversionError {
     Utf8Error(#[from] std::str::Utf8Error),
     #[error(transparent)]
     InvalidFloat(#[from] std::num::ParseFloatError),
-    #[error(transparent)]
-    FromDecStrError(#[from] FromDecStrErr),
+    #[error("{0:?}")]
+    FromDecStrError(FromDecStrErr),
     #[error("Overflow parsing string")]
     ParseOverflow,
     #[error(transparent)]
@@ -84,6 +84,12 @@ pub enum ConversionError {
     InvalidAddressChecksum,
     #[error(transparent)]
     FromHexError(<Address as std::str::FromStr>::Err),
+}
+
+impl From<FromDecStrErr> for ConversionError {
+    fn from(value: FromDecStrErr) -> Self {
+        Self::FromDecStrError(value)
+    }
 }
 
 /// 1 Ether = 1e18 Wei == 0x0de0b6b3a7640000 Wei

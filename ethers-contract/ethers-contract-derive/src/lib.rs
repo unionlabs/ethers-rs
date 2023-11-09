@@ -1,6 +1,6 @@
 //! Procedural macros for generating type-safe bindings to an Ethereum smart contract.
 
-#![deny(missing_docs, unsafe_code, unused_crate_dependencies)]
+#![deny(missing_docs, unsafe_code)] // unused_crate_dependencies
 #![deny(rustdoc::broken_intra_doc_links)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
@@ -14,6 +14,7 @@ mod call;
 pub(crate) mod calllike;
 mod codec;
 mod display;
+#[cfg(feature = "eip712")]
 mod eip712;
 mod error;
 mod event;
@@ -458,6 +459,7 @@ pub fn derive_abi_error(input: TokenStream) -> TokenStream {
 /// There is an Inner helper attribute `#[eip712]` for fields that will eventually be used to
 /// determine if there is a nested eip712 struct. However, this work is not yet complete.
 #[proc_macro_derive(Eip712, attributes(eip712))]
+#[cfg(feature = "eip712")]
 pub fn derive_eip712(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
     match eip712::impl_derive_eip712(&input) {

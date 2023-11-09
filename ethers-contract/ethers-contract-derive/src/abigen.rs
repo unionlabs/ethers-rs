@@ -182,7 +182,7 @@ impl Parse for Method {
             }
             // validate
             ethers_core::abi::ethabi::param_type::Reader::read(&s)
-                .map_err(|e| Error::new(param.ident.span(), e))?;
+                .map_err(|e| Error::new(param.ident.span(), format!("{e:?}")))?;
             signature.push_str(&s);
             if i < last_i {
                 signature.push(',');
