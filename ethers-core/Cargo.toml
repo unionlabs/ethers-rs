@@ -24,21 +24,22 @@ all-features = true
 
 [dependencies]
 # abi
-open-fastrlp = { version = "0.1.4", features = ["std", "derive", "ethereum-types"] }
+open-fastrlp = { version = "0.1.4", default-features = false, features = ["derive"] }
 rlp = { version = "0.5", features = ["derive"] }
-ethabi = { version = "18.0.0", default-features = false, features = ["full-serde", "rlp"] }
+ethabi = { version = "18.0.0", features = ["full-serde", "std"] }
 arrayvec = { version = "0.7", default-features = false }
+ethereum-types = { version = "*", default-features = false, features = ["ethbloom", "rlp", "serialize"] }
 
 # crypto
-elliptic-curve.workspace = true
-generic-array.workspace = true
-k256 = { workspace = true, features = ["ecdsa", "std"] }
-tiny-keccak.workspace = true
-rand.workspace = true
+elliptic-curve = { workspace = true, optional = true }
+generic-array = { workspace = true, optional = true }
+k256 = { workspace = true, features = ["ecdsa", "std"], optional = true }
+tiny-keccak = { workspace = true }
+rand = { workspace = true, optional = true }
 
 # misc
 chrono = { version = "0.4", default-features = false }
-serde.workspace = true
+serde = { workspace = true, features = ["derive"] }
 serde_json = { workspace = true, features = ["arbitrary_precision"] }
 thiserror.workspace = true
 bytes = { workspace = true, features = ["serde"] }
@@ -62,6 +63,18 @@ hex-literal.workspace = true
 rand.workspace = true
 
 [features]
+std = [
+  # "ethabi/std",
+  # "ethabi/full-serde",
+
+  "elliptic-curve",
+  "generic-array",
+  "k256",
+  "rand",
+
+  "open-fastrlp/std",
+  "open-fastrlp/ethereum-types"
+]
 celo = ["legacy"] # celo support extends the transaction format with extra fields
 legacy = []
 macros = ["syn", "cargo_metadata", "once_cell"]

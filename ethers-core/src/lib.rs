@@ -14,7 +14,9 @@ pub mod utils;
 pub mod macros;
 
 // re-export rand to avoid potential confusion when there's rand version mismatches
+#[cfg(feature = "std")]
 pub use rand;
 
 // re-export k256
+#[cfg(feature = "std")]
 pub use k256;

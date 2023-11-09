@@ -11,7 +11,9 @@ pub use ethabi::ethereum_types::{
     Address, BigEndianHash, Bloom, H128, H160, H256, H32, H512, H64, U128, U256, U512, U64,
 };
 
+#[cfg(feature = "std")]
 pub mod transaction;
+#[cfg(feature = "std")]
 pub use transaction::{
     eip1559::Eip1559TransactionRequest,
     eip2930::Eip2930TransactionRequest,
@@ -37,7 +39,9 @@ pub use i256::{ParseI256Error, Sign, I256};
 mod bytes;
 pub use self::bytes::{deserialize_bytes, serialize_bytes, Bytes, ParseBytesError};
 
+#[cfg(feature = "std")]
 mod block;
+#[cfg(feature = "std")]
 pub use block::{Block, BlockId, BlockNumber, TimeError};
 
 #[cfg(feature = "celo")]
@@ -46,19 +50,27 @@ pub use block::Randomness;
 mod log;
 pub use log::Log;
 
+#[cfg(feature = "std")]
 mod filter;
+#[cfg(feature = "std")]
 pub use filter::*;
 
 mod ens;
 pub use ens::NameOrAddress;
 
+#[cfg(feature = "std")]
 mod signature;
+#[cfg(feature = "std")]
 pub use signature::*;
 
+#[cfg(feature = "std")]
 mod txpool;
+#[cfg(feature = "std")]
 pub use txpool::*;
 
+#[cfg(feature = "std")]
 mod trace;
+#[cfg(feature = "std")]
 pub use trace::*;
 
 mod chain;

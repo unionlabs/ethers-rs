@@ -1,26 +1,29 @@
 /// Utilities for launching a ganache-cli testnet instance
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 mod ganache;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 pub use ganache::{Ganache, GanacheInstance};
 
 /// Utilities for launching a go-ethereum dev-mode instance
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 mod geth;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 pub use geth::{Geth, GethInstance};
 
 /// Utilities for working with a `genesis.json` and other chain config structs.
+#[cfg(feature = "std")]
 mod genesis;
+#[cfg(feature = "std")]
 pub use genesis::{ChainConfig, CliqueConfig, EthashConfig, Genesis, GenesisAccount};
 
 /// Utilities for launching an anvil instance
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 mod anvil;
-#[cfg(not(target_arch = "wasm32"))]
+#[cfg(all(feature = "std", not(target_arch = "wasm32")))]
 pub use anvil::{Anvil, AnvilInstance};
 
 /// Moonbeam utils
+#[cfg(feature = "std")]
 pub mod moonbeam;
 
 mod hash;
@@ -37,8 +40,10 @@ pub use rlp;
 pub use hex;
 
 use crate::types::{Address, Bytes, ParseI256Error, H256, I256, U256};
+#[cfg(feature = "std")]
 use elliptic_curve::sec1::ToEncodedPoint;
 use ethabi::ethereum_types::FromDecStrErr;
+#[cfg(feature = "std")]
 use k256::{
     ecdsa::{SigningKey, VerifyingKey},
     AffinePoint,
@@ -298,6 +303,7 @@ where
 /// The address for an Ethereum contract is deterministically computed from the
 /// address of its creator (sender) and how many transactions the creator has
 /// sent (nonce). The sender and nonce are RLP encoded and then hashed with Keccak-256.
+#[cfg(feature = "std")]
 pub fn get_contract_address(sender: impl Into<Address>, nonce: impl Into<U256>) -> Address {
     let mut stream = rlp::RlpStream::new();
     stream.begin_list(2);
@@ -315,6 +321,7 @@ pub fn get_contract_address(sender: impl Into<Address>, nonce: impl Into<U256>) 
 /// [EIP1014](https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md)
 ///
 /// keccak256( 0xff ++ senderAddress ++ salt ++ keccak256(init_code))[12..]
+#[cfg(feature = "std")]
 pub fn get_create2_address(
     from: impl Into<Address>,
     salt: impl AsRef<[u8]>,
@@ -372,6 +379,7 @@ pub fn get_create2_address(
 ///         .unwrap()
 /// );
 /// ```
+#[cfg(feature = "std")]
 pub fn get_create2_address_from_hash(
     from: impl Into<Address>,
     salt: impl AsRef<[u8]>,
@@ -405,6 +413,7 @@ pub fn get_create2_address_from_hash(
 /// ### Panics
 ///
 /// When the input is not EXACTLY 64 bytes.
+#[cfg(feature = "std")]
 pub fn raw_public_key_to_address<T: AsRef<[u8]>>(pubkey: T) -> Address {
     let pubkey = pubkey.as_ref();
     assert_eq!(pubkey.len(), 64, "raw public key must be 64 bytes");
@@ -414,6 +423,7 @@ pub fn raw_public_key_to_address<T: AsRef<[u8]>>(pubkey: T) -> Address {
 
 /// Converts an public key, in compressed or uncompressed form to an Ethereum
 /// address
+#[cfg(feature = "std")]
 pub fn public_key_to_address(pubkey: &VerifyingKey) -> Address {
     let affine: &AffinePoint = pubkey.as_ref();
     let encoded = affine.to_encoded_point(false);
@@ -421,6 +431,7 @@ pub fn public_key_to_address(pubkey: &VerifyingKey) -> Address {
 }
 
 /// Converts a K256 SigningKey to an Ethereum Address
+#[cfg(feature = "std")]
 pub fn secret_key_to_address(secret_key: &SigningKey) -> Address {
     let public_key = secret_key.verifying_key();
 
@@ -435,6 +446,7 @@ pub fn secret_key_to_address(secret_key: &SigningKey) -> Address {
 /// [EIP-55]: https://eips.ethereum.org/EIPS/eip-55
 /// [EIP-155 chain ID]: https://eips.ethereum.org/EIPS/eip-155
 /// [EIP-1191]: https://eips.ethereum.org/EIPS/eip-1191
+#[cfg(feature = "std")]
 pub fn to_checksum(addr: &Address, chain_id: Option<u8>) -> String {
     let prefixed_addr = match chain_id {
         Some(chain_id) => format!("{chain_id}0x{addr:x}"),
@@ -460,6 +472,7 @@ pub fn to_checksum(addr: &Address, chain_id: Option<u8>) -> String {
 ///
 /// Returns `Ok(address)` if the checksummed address is valid, `Err()` otherwise.
 /// If `chain_id` is `None`, falls back to [EIP-55](https://eips.ethereum.org/EIPS/eip-55) address checksum method
+#[cfg(feature = "std")]
 pub fn parse_checksummed(addr: &str, chain_id: Option<u8>) -> Result<Address, ConversionError> {
     let addr = addr.strip_prefix("0x").unwrap_or(addr);
     let address: Address = addr.parse().map_err(ConversionError::FromHexError)?;
@@ -908,6 +921,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn addr_checksum() {
         let addr_list = vec![
             // mainnet
@@ -996,6 +1010,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn checksummed_parse() {
         let cases = vec![
             // mainnet
@@ -1043,6 +1058,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn contract_address() {
         // http://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
         let from = "6ac7ea33f8831ea9dcc53393aaa88b25a785dbf0".parse::<Address>().unwrap();
@@ -1062,6 +1078,7 @@ mod tests {
 
     #[test]
     // Test vectors from https://github.com/ethereum/EIPs/blob/master/EIPS/eip-1014.md#examples
+    #[cfg(feature = "std")]
     fn create2_address() {
         for (from, salt, init_code, expected) in &[
             (
@@ -1232,6 +1249,7 @@ mod tests {
 
     // Only tests for correctness, no edge cases. Uses examples from https://docs.ethers.org/v5/api/utils/address/#utils-computeAddress
     #[test]
+    #[cfg(feature = "std")]
     fn test_public_key_to_address() {
         let addr = "0Ac1dF02185025F65202660F8167210A80dD5086".parse::<Address>().unwrap();
 
@@ -1249,6 +1267,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_raw_public_key_to_address() {
         let addr = "0Ac1dF02185025F65202660F8167210A80dD5086".parse::<Address>().unwrap();
 
@@ -1259,6 +1278,7 @@ mod tests {
 
     #[test]
     #[should_panic]
+    #[cfg(feature = "std")]
     fn test_raw_public_key_to_address_panics() {
         let fake_pkb = vec![];
 

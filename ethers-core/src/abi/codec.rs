@@ -223,6 +223,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn address_codec() {
         test_codec_rng::<Address>();
     }
@@ -267,6 +268,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "std")]
     fn tuple_array() {
         let nested: Vec<[u8; 4]> = vec![[0, 0, 0, 1]];
         assert_codec(nested.clone());

@@ -1,6 +1,8 @@
 //! Some convenient serde helpers
 
-use crate::types::{BlockNumber, U256, U64};
+#[cfg(feature = "std")]
+use crate::types::BlockNumber;
+use crate::types::{U256, U64};
 use serde::{Deserialize, Deserializer};
 use std::{
     convert::{TryFrom, TryInto},
@@ -210,11 +212,13 @@ where
 /// Helper type to parse numeric strings, `u64` and `U256`
 #[derive(Deserialize, Debug, Clone)]
 #[serde(untagged)]
+#[cfg(feature = "std")]
 pub enum StringifiedBlockNumber {
     Numeric(StringifiedNumeric),
     BlockNumber(BlockNumber),
 }
 
+#[cfg(feature = "std")]
 impl TryFrom<StringifiedBlockNumber> for BlockNumber {
     type Error = String;
 
@@ -233,6 +237,7 @@ impl TryFrom<StringifiedBlockNumber> for BlockNumber {
 /// Supports parsing block number as strings
 ///
 /// See <https://github.com/gakonst/ethers-rs/issues/1507>
+#[cfg(feature = "std")]
 pub fn deserialize_stringified_block_number<'de, D>(
     deserializer: D,
 ) -> Result<BlockNumber, D::Error>
@@ -246,11 +251,13 @@ where
 /// Various block number representations, See [`lenient_block_number()`]
 #[derive(Clone, Copy, Deserialize)]
 #[serde(untagged)]
+#[cfg(feature = "std")]
 pub enum LenientBlockNumber {
     BlockNumber(BlockNumber),
     Num(u64),
 }
 
+#[cfg(feature = "std")]
 impl From<LenientBlockNumber> for BlockNumber {
     fn from(b: LenientBlockNumber) -> Self {
         match b {
@@ -279,6 +286,7 @@ impl From<LenientBlockNumber> for BlockNumber {
 /// However, there are dev node implementations that support integers, such as ganache: <https://github.com/foundry-rs/foundry/issues/1868>
 ///
 /// N.B.: geth does not support ints in `eth_getBlockByNumber`
+#[cfg(feature = "std")]
 pub fn lenient_block_number<'de, D>(deserializer: D) -> Result<BlockNumber, D::Error>
 where
     D: Deserializer<'de>,
@@ -287,6 +295,7 @@ where
 }
 
 /// Same as `lenient_block_number` but requires to be `[num; 1]`
+#[cfg(feature = "std")]
 pub fn lenient_block_number_seq<'de, D>(deserializer: D) -> Result<BlockNumber, D::Error>
 where
     D: Deserializer<'de>,
@@ -301,6 +310,7 @@ mod tests {
     use crate::types::U256;
 
     #[test]
+    #[cfg(feature = "std")]
     fn test_deserialize_string_chain_id() {
         use crate::types::transaction::eip712::EIP712Domain;
 
