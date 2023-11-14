@@ -698,3 +698,6 @@ fn derive_empty_events() {
 
     assert_eq!(EmptyEvent2Filter::abi_signature(), "EmptyEvent2()");
 }
+
+#[derive(EthAbiType, EthAbiCodec)]
+struct T<U>(U);

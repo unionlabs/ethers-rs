@@ -14,16 +14,24 @@ pub fn derive_tokenizeable_impl(input: &DeriveInput) -> Result<TokenStream, Erro
     let (impl_generics, ty_generics, where_clause) = input.generics.split_for_impl();
     let generic_predicates = where_clause.map(|c| &c.predicates);
 
-    let (tokenize_predicates, params_len, init_struct_impl, into_token_impl) = match input.data {
-        Data::Struct(ref data) => match data.fields {
-            Fields::Named(ref fields) => {
-                let tokenize_predicates = fields.named.iter().map(|f| {
-                    let ty = &f.ty;
-                    quote_spanned! { f.span() => #ty: #ethers_core::abi::Tokenize }
-                });
-                let tokenize_predicates = quote! { #(#tokenize_predicates,)* };
+    let (tokenize_predicates, abi_type_predicates, params_len, init_struct_impl, into_token_impl) =
+        match input.data {
+            Data::Struct(ref data) => match data.fields {
+                Fields::Named(ref fields) => {
+                    let tokenize_predicates = fields.named.iter().map(|f| {
+                        let ty = &f.ty;
+                        quote_spanned! { f.span() => #ty: #ethers_core::abi::Tokenizable }
+                    });
 
-                let assignments = fields.named.iter().map(|f| {
+                    let abi_type_predicates = fields.named.iter().map(|f| {
+                        let ty = &f.ty;
+                        quote_spanned! { f.span() => #ty: #ethers_core::abi::AbiType }
+                    });
+                    let abi_type_predicates = quote! { #(#abi_type_predicates,)* };
+
+                    let tokenize_predicates = quote! { #(#tokenize_predicates,)* };
+
+                    let assignments = fields.named.iter().map(|f| {
                     let name = f.ident.as_ref().expect("Named fields have names");
                     quote_spanned! { f.span() =>
                         #name: #ethers_core::abi::Tokenizable::from_token(
@@ -31,47 +39,65 @@ pub fn derive_tokenizeable_impl(input: &DeriveInput) -> Result<TokenStream, Erro
                         )?
                     }
                 });
-                let init_struct_impl = quote! { Self { #(#assignments,)* } };
+                    let init_struct_impl = quote! { Self { #(#assignments,)* } };
 
-                let into_token = fields.named.iter().map(|f| {
-                    let name = f.ident.as_ref().expect("Named fields have names");
-                    quote_spanned! { f.span() => self.#name.into_token() }
-                });
-                let into_token_impl = quote! { #(#into_token,)* };
+                    let into_token = fields.named.iter().map(|f| {
+                        let name = f.ident.as_ref().expect("Named fields have names");
+                        quote_spanned! { f.span() => self.#name.into_token() }
+                    });
+                    let into_token_impl = quote! { #(#into_token,)* };
 
-                (tokenize_predicates, fields.named.len(), init_struct_impl, into_token_impl)
-            }
-            Fields::Unnamed(ref fields) => {
-                let tokenize_predicates = fields.unnamed.iter().map(|f| {
-                    let ty = &f.ty;
-                    quote_spanned! { f.span() => #ty: #ethers_core::abi::Tokenize }
-                });
-                let tokenize_predicates = quote! { #(#tokenize_predicates,)* };
+                    (
+                        tokenize_predicates,
+                        abi_type_predicates,
+                        fields.named.len(),
+                        init_struct_impl,
+                        into_token_impl,
+                    )
+                }
+                Fields::Unnamed(ref fields) => {
+                    let tokenize_predicates = fields.unnamed.iter().map(|f| {
+                        let ty = &f.ty;
+                        quote_spanned! { f.span() => #ty: #ethers_core::abi::Tokenizable }
+                    });
+                    let tokenize_predicates = quote! { #(#tokenize_predicates,)* };
 
-                let assignments = fields.unnamed.iter().map(|f| {
+                    let abi_type_predicates = fields.unnamed.iter().map(|f| {
+                        let ty = &f.ty;
+                        quote_spanned! { f.span() => #ty: #ethers_core::abi::AbiType }
+                    });
+                    let abi_type_predicates = quote! { #(#abi_type_predicates,)* };
+
+                    let assignments = fields.unnamed.iter().map(|f| {
                     quote_spanned! { f.span() =>
                         #ethers_core::abi::Tokenizable::from_token(
                             iter.next().expect("The iter is guaranteed to be something due to the size check")
                         )?
                     }
                 });
-                let init_struct_impl = quote! { Self(#(#assignments,)* ) };
+                    let init_struct_impl = quote! { Self(#(#assignments,)* ) };
 
-                let into_token = fields.unnamed.iter().enumerate().map(|(i, f)| {
-                    let idx = syn::Index::from(i);
-                    quote_spanned! { f.span() => self.#idx.into_token() }
-                });
-                let into_token_impl = quote! { #(#into_token,)* };
+                    let into_token = fields.unnamed.iter().enumerate().map(|(i, f)| {
+                        let idx = syn::Index::from(i);
+                        quote_spanned! { f.span() => self.#idx.into_token() }
+                    });
+                    let into_token_impl = quote! { #(#into_token,)* };
 
-                (tokenize_predicates, fields.unnamed.len(), init_struct_impl, into_token_impl)
+                    (
+                        tokenize_predicates,
+                        abi_type_predicates,
+                        fields.unnamed.len(),
+                        init_struct_impl,
+                        into_token_impl,
+                    )
+                }
+                Fields::Unit => return Ok(tokenize_unit_type(&input.ident)),
+            },
+            Data::Enum(ref data) => return tokenize_enum(name, data.variants.iter()),
+            Data::Union(_) => {
+                return Err(Error::new(input.span(), "EthAbiType cannot be derived for unions"))
             }
-            Fields::Unit => return Ok(tokenize_unit_type(&input.ident)),
-        },
-        Data::Enum(ref data) => return tokenize_enum(name, data.variants.iter()),
-        Data::Union(_) => {
-            return Err(Error::new(input.span(), "EthAbiType cannot be derived for unions"))
-        }
-    };
+        };
 
     // there might be the case that the event has only 1 params, which is not a
     // tuple
@@ -123,13 +149,21 @@ pub fn derive_tokenizeable_impl(input: &DeriveInput) -> Result<TokenStream, Erro
     let params = utils::derive_param_type_with_abi_type(input, "EthAbiType")?;
 
     Ok(quote! {
-        impl #impl_generics #ethers_core::abi::AbiType for #name #ty_generics #where_clause {
+        impl #impl_generics #ethers_core::abi::AbiType for #name #ty_generics
+        where
+            #generic_predicates
+            #abi_type_predicates
+        {
             fn param_type() -> #ethers_core::abi::ParamType {
                 #params
             }
         }
 
-        impl #impl_generics #ethers_core::abi::AbiArrayType for #name #ty_generics #where_clause {}
+        impl #impl_generics #ethers_core::abi::AbiArrayType for #name #ty_generics
+        where
+            #generic_predicates
+            #abi_type_predicates
+        {}
 
         impl #impl_generics #ethers_core::abi::Tokenizable for #name #ty_generics
         where

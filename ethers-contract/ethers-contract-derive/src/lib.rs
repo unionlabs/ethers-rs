@@ -198,7 +198,11 @@ pub fn derive_abi_type(input: TokenStream) -> TokenStream {
 #[proc_macro_derive(EthAbiCodec)]
 pub fn derive_abi_codec(input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as DeriveInput);
-    codec::derive_codec_impl(&input).into()
+    let derive_codec_impl = codec::derive_codec_impl(&input);
+
+    // println!("{derive_codec_impl}");
+
+    derive_codec_impl.into()
 }
 
 /// Derives the [`Display`] trait on structs by formatting each field based on its Ethereum type.
