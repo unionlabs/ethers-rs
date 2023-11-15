@@ -47,8 +47,12 @@ pub use ethers_contract_abigen::{
 #[cfg(feature = "ethers-contract-derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "ethers-contract-derive")))]
 pub use ethers_contract_derive::{
-    abigen, Eip712, EthAbiCodec, EthAbiType, EthCall, EthDisplay, EthError, EthEvent,
+    abigen, EthAbiCodec, EthAbiType, EthCall, EthDisplay, EthError, EthEvent,
 };
+
+#[cfg(feature = "ethers-contract-derive/eip712")]
+#[cfg_attr(docsrs, doc(cfg(feature = "ethers-contract-derive/eip712")))]
+pub use ethers_contract_derive::Eip712;
 
 // Hide the Lazy re-export, it's just for convenience
 #[doc(hidden)]

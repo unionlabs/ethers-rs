@@ -23,7 +23,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 all-features = true
 
 [dependencies]
-ethers-core.workspace = true
+ethers-core = { workspace = true, default-features = true }
 
 serde.workspace = true
 serde_json = { workspace = true, features = ["raw_value"] }
