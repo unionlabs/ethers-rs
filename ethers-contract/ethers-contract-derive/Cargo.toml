@@ -36,4 +36,4 @@ serde_json.workspace = true
 default = ["providers", "eip712"]
 
 providers = ["ethers-contract-abigen/providers"]
-eip712 = []
+eip712 = ["ethers-core/std"]

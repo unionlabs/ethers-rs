@@ -24,7 +24,14 @@ all-features = true
 
 [features]
 default = ["abigen", "rustls", "providers"]
-providers = ["ethers-middleware/providers"]
+providers = [
+    "ethers-etherscan",
+    "ethers-middleware",
+    "ethers-providers",
+    "ethers-signers",
+    "ethers-addressbook",
+    "ethers-contract"
+]
 
 # workspace-wide features
 legacy = ["ethers-core/legacy", "ethers-contract/legacy"]
@@ -60,6 +67,8 @@ openssl = [
     "ethers-solc?/openssl",
 ]
 
+std = ["ethers-core/std"]
+
 # ethers-providers
 ws = ["ethers-providers/ws"]
 legacy-ws = ["ethers-providers/legacy-ws"]
@@ -87,12 +96,13 @@ eip712 = []
 solc-sha2-asm = []
 
 [dependencies]
-ethers-addressbook.workspace = true
-ethers-contract = { workspace = true, features = ["providers"] }
-ethers-core.workspace = true
-ethers-etherscan.workspace = true
-ethers-middleware.workspace = true
-ethers-providers.workspace = true
-ethers-signers.workspace = true
+ethers-core = { workspace = true, default-features = false }
+
+ethers-addressbook = { workspace = true, optional = true }
+ethers-contract = { workspace = true, optional = true, features = ["providers"] }
+ethers-etherscan = { workspace = true, optional = true }
+ethers-middleware = { workspace = true, optional = true, features = ["providers"] }
+ethers-providers = { workspace = true, optional = true }
+ethers-signers = { workspace = true, optional = true }
 
 ethers-solc = { workspace = true, optional = true }
