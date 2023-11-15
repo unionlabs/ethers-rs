@@ -44,8 +44,8 @@ pub use ethers_contract_abigen::{
     Abigen, ContractFilter, ExcludeContracts, InternalStructs, MultiAbigen, SelectContracts,
 };
 
-#[cfg(feature = "abigen")]
-#[cfg_attr(docsrs, doc(cfg(feature = "abigen")))]
+#[cfg(feature = "ethers-contract-derive")]
+#[cfg_attr(docsrs, doc(cfg(feature = "ethers-contract-derive")))]
 pub use ethers_contract_derive::{
     abigen, Eip712, EthAbiCodec, EthAbiType, EthCall, EthDisplay, EthError, EthEvent,
 };

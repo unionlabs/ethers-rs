@@ -99,7 +99,7 @@ solc-sha2-asm = []
 ethers-core = { workspace = true, default-features = false }
 
 ethers-addressbook = { workspace = true, optional = true }
-ethers-contract = { workspace = true }
+ethers-contract = { workspace = true, features = ["ethers-contract-derive"] }
 ethers-etherscan = { workspace = true, optional = true }
 ethers-middleware = { workspace = true, optional = true, features = ["providers"] }
 ethers-providers = { workspace = true, optional = true }
