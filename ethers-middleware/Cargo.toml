@@ -62,8 +62,10 @@ reqwest = { workspace = true, features = ["json", "rustls"] }
 tokio = { workspace = true, features = ["rt-multi-thread", "macros", "time"] }
 
 [features]
-default = ["rustls"]
+default = ["rustls", "providers"]
 celo = ["ethers-core/celo", "ethers-providers/celo", "ethers-signers/celo", "ethers-contract/celo"]
 optimism = ["ethers-core/optimism", "ethers-providers/optimism", "ethers-contract/optimism"]
 rustls = ["reqwest/rustls-tls"]
 openssl = ["reqwest/native-tls"]
+# for the abigen, all providers-related items are feature-gated to "providers"
+providers = []

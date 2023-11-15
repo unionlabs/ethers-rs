@@ -81,7 +81,6 @@ impl ExpandedContract {
             pub mod #module {
                 #imports
                 #include_tokens
-                #[cfg(feature = "providers")]
                 #contract
                 #errors
                 #events
@@ -152,6 +151,7 @@ impl Context {
         let errors_decl = self.errors()?;
 
         let contract = quote! {
+            #[cfg(feature = "providers")]
             #struct_decl
         };
 
@@ -171,7 +171,6 @@ impl Context {
             let ethers_providers = ethers_providers_crate();
 
             quote! {
-                #[cfg(feature = "providers")]
                 #contract
 
                 #[cfg(feature = "providers")]
@@ -408,12 +407,15 @@ impl Context {
 
         let code = quote! {
             // The `Lazy` ABI
+            #[cfg(feature = "providers")]
             #abi
 
             // The static Bytecode, if present
+            #[cfg(feature = "providers")]
             #bytecode
 
             // The static deployed Bytecode, if present
+            #[cfg(feature = "providers")]
             #deployed_bytecode
         };
 
