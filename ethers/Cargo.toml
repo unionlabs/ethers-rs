@@ -23,7 +23,8 @@ rustdoc-args = ["--cfg", "docsrs"]
 all-features = true
 
 [features]
-default = ["abigen", "rustls"]
+default = ["abigen", "rustls", "providers"]
+providers = ["ethers-middleware/providers"]
 
 # workspace-wide features
 legacy = ["ethers-core/legacy", "ethers-contract/legacy"]
