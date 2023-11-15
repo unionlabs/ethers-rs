@@ -81,6 +81,7 @@ impl ExpandedContract {
             pub mod #module {
                 #imports
                 #include_tokens
+                #[cfg(feature = "providers")]
                 #contract
                 #errors
                 #events
@@ -170,8 +171,10 @@ impl Context {
             let ethers_providers = ethers_providers_crate();
 
             quote! {
+                #[cfg(feature = "providers")]
                 #contract
 
+                #[cfg(feature = "providers")]
                 impl<M: #ethers_providers::Middleware> #name<M> {
                     /// Creates a new contract instance with the specified `ethers` client at
                     /// `address`. The contract derefs to a `ethers::Contract` object.
@@ -186,6 +189,7 @@ impl Context {
                     #contract_events
                 }
 
+                #[cfg(feature = "providers")]
                 impl<M: #ethers_providers::Middleware> From<#ethers_contract::Contract<M>> for #name<M> {
                     fn from(contract: #ethers_contract::Contract<M>) -> Self {
                         Self::new(contract.address(), contract.client())
