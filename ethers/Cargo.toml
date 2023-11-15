@@ -30,7 +30,7 @@ providers = [
     "ethers-providers",
     "ethers-signers",
     "ethers-addressbook",
-    "ethers-contract"
+    "ethers-contract/providers"
 ]
 
 # workspace-wide features
@@ -99,7 +99,7 @@ solc-sha2-asm = []
 ethers-core = { workspace = true, default-features = false }
 
 ethers-addressbook = { workspace = true, optional = true }
-ethers-contract = { workspace = true, optional = true, features = ["providers"] }
+ethers-contract = { workspace = true }
 ethers-etherscan = { workspace = true, optional = true }
 ethers-middleware = { workspace = true, optional = true, features = ["providers"] }
 ethers-providers = { workspace = true, optional = true }

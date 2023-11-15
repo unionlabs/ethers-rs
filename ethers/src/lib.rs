@@ -118,7 +118,6 @@ pub mod prelude {
     #[cfg(feature = "providers")]
     pub use super::addressbook::contract;
 
-    #[cfg(feature = "providers")]
     pub use super::contract::*;
 
     pub use super::core::{types::*, *};
