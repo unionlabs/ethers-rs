@@ -85,18 +85,24 @@
 #![doc(test(no_crate_inject, attr(deny(rust_2018_idioms), allow(dead_code, unused_variables))))]
 
 #[doc(inline)]
+#[cfg(feature = "providers")]
 pub use ethers_addressbook as addressbook;
 #[doc(inline)]
+#[cfg(feature = "providers")]
 pub use ethers_contract as contract;
 #[doc(inline)]
 pub use ethers_core as core;
+#[cfg(feature = "providers")]
 #[doc(inline)]
 pub use ethers_etherscan as etherscan;
 #[doc(inline)]
+#[cfg(feature = "providers")]
 pub use ethers_middleware as middleware;
 #[doc(inline)]
+#[cfg(feature = "providers")]
 pub use ethers_providers as providers;
 #[doc(inline)]
+#[cfg(feature = "providers")]
 pub use ethers_signers as signers;
 #[cfg(feature = "ethers-solc")]
 #[doc(inline)]
@@ -109,18 +115,24 @@ pub use ethers_core::{abi, types, utils};
 #[doc(hidden)]
 #[allow(unknown_lints, ambiguous_glob_reexports)]
 pub mod prelude {
+    #[cfg(feature = "providers")]
     pub use super::addressbook::contract;
 
+    #[cfg(feature = "providers")]
     pub use super::contract::*;
 
     pub use super::core::{types::*, *};
 
+    #[cfg(feature = "providers")]
     pub use super::etherscan::*;
 
+    #[cfg(feature = "providers")]
     pub use super::middleware::*;
 
+    #[cfg(feature = "providers")]
     pub use super::providers::*;
 
+    #[cfg(feature = "providers")]
     pub use super::signers::*;
 
     #[cfg(feature = "ethers-solc")]
