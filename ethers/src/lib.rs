@@ -88,7 +88,6 @@
 #[cfg(feature = "providers")]
 pub use ethers_addressbook as addressbook;
 #[doc(inline)]
-#[cfg(feature = "providers")]
 pub use ethers_contract as contract;
 #[doc(inline)]
 pub use ethers_core as core;
