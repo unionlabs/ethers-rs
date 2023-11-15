@@ -369,11 +369,13 @@ impl Context {
             let abi = crate::verbatim::generate(&self.abi, &ethers_core);
             quote! {
                 #[allow(deprecated)]
+                #[cfg(feature = "providers")]
                 fn __abi() -> #ethers_core::abi::Abi {
                     #abi
                 }
 
                 #[doc = #doc_str]
+                #[cfg(feature = "providers")]
                 pub static #abi_name: #ethers_contract::Lazy<#ethers_core::abi::Abi> =
                     #ethers_contract::Lazy::new(__abi);
             }
@@ -384,9 +386,11 @@ impl Context {
             let bytecode_name = self.inline_bytecode_ident();
             quote! {
                 #[rustfmt::skip]
+                #[cfg(feature = "providers")]
                 const __BYTECODE: &[u8] = #bytecode;
 
                 /// The bytecode of the contract.
+                #[cfg(feature = "providers")]
                 pub static #bytecode_name: #ethers_core::types::Bytes =
                     #ethers_core::types::Bytes::from_static(__BYTECODE);
             }
@@ -397,9 +401,11 @@ impl Context {
             let bytecode_name = self.inline_deployed_bytecode_ident();
             quote! {
                 #[rustfmt::skip]
+                #[cfg(feature = "providers")]
                 const __DEPLOYED_BYTECODE: &[u8] = #bytecode;
 
                 /// The deployed bytecode of the contract.
+                #[cfg(feature = "providers")]
                 pub static #bytecode_name: #ethers_core::types::Bytes =
                     #ethers_core::types::Bytes::from_static(__DEPLOYED_BYTECODE);
             }
@@ -407,15 +413,12 @@ impl Context {
 
         let code = quote! {
             // The `Lazy` ABI
-            #[cfg(feature = "providers")]
             #abi
 
             // The static Bytecode, if present
-            #[cfg(feature = "providers")]
             #bytecode
 
             // The static deployed Bytecode, if present
-            #[cfg(feature = "providers")]
             #deployed_bytecode
         };
 
@@ -427,9 +430,11 @@ impl Context {
                 #code
 
                 // Struct declaration
+                #[cfg(feature = "providers")]
                 pub struct #name<M>(#ethers_contract::Contract<M>);
 
                 // Manual implementation since `M` is stored in `Arc<M>` and does not need to be `Clone`
+                #[cfg(feature = "providers")]
                 impl<M> ::core::clone::Clone for #name<M> {
                     fn clone(&self) -> Self {
                         Self(::core::clone::Clone::clone(&self.0))
@@ -437,6 +442,7 @@ impl Context {
                 }
 
                 // Deref to the inner contract to have access to all its methods
+                #[cfg(feature = "providers")]
                 impl<M> ::core::ops::Deref for #name<M> {
                     type Target = #ethers_contract::Contract<M>;
 
@@ -445,6 +451,7 @@ impl Context {
                     }
                 }
 
+                #[cfg(feature = "providers")]
                 impl<M> ::core::ops::DerefMut for #name<M> {
                     fn deref_mut(&mut self) -> &mut Self::Target {
                         &mut self.0
@@ -452,6 +459,7 @@ impl Context {
                 }
 
                 // `<name>(<address>)`
+                #[cfg(feature = "providers")]
                 impl<M> ::core::fmt::Debug for #name<M> {
                     fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                         f.debug_tuple(::core::stringify!(#name))
