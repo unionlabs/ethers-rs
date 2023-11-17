@@ -7,6 +7,7 @@ mod online;
 #[cfg(all(feature = "online", not(target_arch = "wasm32")))]
 pub use online::Explorer;
 
+#[cfg(feature = "fs")]
 use crate::util;
 use eyre::{Error, Result};
 use std::{env, fs, path::PathBuf, str::FromStr};

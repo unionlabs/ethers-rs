@@ -47,8 +47,12 @@ pub use ethers_contract_abigen::{
 #[cfg(feature = "ethers-contract-derive")]
 #[cfg_attr(docsrs, doc(cfg(feature = "ethers-contract-derive")))]
 pub use ethers_contract_derive::{
-    abigen, EthAbiCodec, EthAbiType, EthCall, EthDisplay, EthError, EthEvent,
+    EthAbiCodec, EthAbiType, EthCall, EthDisplay, EthError, EthEvent,
 };
+
+#[cfg(feature = "ethers-contract-derive/abigen")]
+#[cfg_attr(docsrs, doc(cfg(feature = "ethers-contract-derive/abigen")))]
+pub use ethers_contract_derive::abigen;
 
 #[cfg(feature = "ethers-contract-derive/eip712")]
 #[cfg_attr(docsrs, doc(cfg(feature = "ethers-contract-derive/eip712")))]

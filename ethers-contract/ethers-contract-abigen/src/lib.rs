@@ -260,6 +260,7 @@ impl Abigen {
 
     /// Expands the `Abigen` and returns the [`ExpandedContract`] that holds all tokens and the
     /// [`Context`] that holds the state used during expansion.
+    #[cfg(feature = "fs")]
     pub fn expand(self) -> Result<(ExpandedContract, Context)> {
         let ctx = Context::from_abigen(self)?;
         Ok((ctx.expand()?, ctx))
@@ -368,6 +369,7 @@ impl fmt::Debug for ContractBindings {
     }
 }
 
+#[cfg(feature = "fs")]
 impl ContractBindings {
     /// Writes the bindings to a new Vec.
     pub fn to_vec(&self) -> Vec<u8> {
