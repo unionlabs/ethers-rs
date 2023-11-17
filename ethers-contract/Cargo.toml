@@ -49,7 +49,7 @@ default = ["abigen", "providers"]
 
 providers = ["ethers-providers", "ethers-contract-abigen/providers", "ethers-contract-derive/providers"]
 
-abigen = ["ethers-contract-abigen", "ethers-contract-derive/eip712", "ethers-contract-derive/abigen"]
+abigen = ["ethers-contract-abigen", "ethers-contract-derive/eip712", "ethers-contract-derive/abigen", "ethers-contract-abigen/fs"]
 abigen-online = ["abigen", "ethers-contract-abigen/online"]
 
 celo = ["legacy", "ethers-core/celo", "ethers-providers/celo"]
