@@ -4,11 +4,13 @@
 #![deny(rustdoc::broken_intra_doc_links)]
 #![cfg_attr(docsrs, feature(doc_cfg))]
 
+#[cfg(feature = "abigen")]
 use abigen::Contracts;
 use proc_macro::TokenStream;
 use syn::{parse_macro_input, DeriveInput};
 
 pub(crate) mod abi_ty;
+#[cfg(feature = "abigen")]
 mod abigen;
 mod call;
 pub(crate) mod calllike;
@@ -112,6 +114,7 @@ pub(crate) mod utils;
 /// );
 /// ```
 #[proc_macro]
+#[cfg(feature = "abigen")]
 pub fn abigen(input: TokenStream) -> TokenStream {
     let contracts = parse_macro_input!(input as Contracts);
     match contracts.expand() {

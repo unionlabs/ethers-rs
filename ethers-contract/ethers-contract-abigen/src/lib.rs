@@ -17,13 +17,19 @@
 #[path = "test/macros.rs"]
 mod test_macros;
 
+#[cfg(feature = "fs")]
 pub mod contract;
+#[cfg(feature = "fs")]
 pub use contract::structs::InternalStructs;
 
+#[cfg(feature = "fs")]
 pub mod filter;
+#[cfg(feature = "fs")]
 pub use filter::{ContractFilter, ExcludeContracts, SelectContracts};
 
+#[cfg(feature = "fs")]
 pub mod multi;
+#[cfg(feature = "fs")]
 pub use multi::MultiAbigen;
 
 mod source;
@@ -31,11 +37,14 @@ mod source;
 pub use source::Explorer;
 pub use source::Source;
 
+#[cfg(feature = "fs")]
 mod util;
+#[cfg(feature = "fs")]
 mod verbatim;
 
 pub use ethers_core::types::Address;
 
+#[cfg(feature = "fs")]
 use contract::{Context, ExpandedContract};
 use eyre::Result;
 use proc_macro2::{Ident, TokenStream};
@@ -115,6 +124,7 @@ impl Abigen {
     ///
     /// If `contract_name` could not be parsed as a valid [Ident], or if `abi_source` could not be
     /// parsed as a valid [Source].
+    #[cfg(feature = "fs")]
     pub fn new<T: AsRef<str>, S: AsRef<str>>(contract_name: T, abi_source: S) -> Result<Self> {
         let abi_source: Source = abi_source.as_ref().parse()?;
         Ok(Self {
@@ -126,6 +136,7 @@ impl Abigen {
     }
 
     /// Creates a new builder with the given contract name [Ident] and [ABI source][Source].
+    #[cfg(feature = "fs")]
     pub fn new_raw(contract_name: Ident, abi_source: Source) -> Self {
         Self {
             emit_cargo_directives: abi_source.is_local() && in_build_script(),
@@ -136,6 +147,7 @@ impl Abigen {
     }
 
     /// Attempts to load a new builder from an ABI JSON file at the specific path.
+    #[cfg(feature = "fs")]
     pub fn from_file(path: impl AsRef<Path>) -> Result<Self> {
         let path = path.as_ref();
         let path = path
@@ -226,6 +238,7 @@ impl Abigen {
     }
 
     /// Generates the contract bindings.
+    #[cfg(feature = "fs")]
     pub fn generate(self) -> Result<ContractBindings> {
         let format = self.format;
         let emit = self.emit_cargo_directives;
@@ -413,6 +426,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[cfg(feature = "fs")]
     fn can_generate_structs() {
         let greeter = include_str!("../../tests/solidity-contracts/greeter_with_struct.json");
         let abigen = Abigen::new("Greeter", greeter).unwrap();

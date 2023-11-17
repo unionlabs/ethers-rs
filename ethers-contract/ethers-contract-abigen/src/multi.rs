@@ -93,6 +93,7 @@ impl MultiAbigen {
     /// let gen = MultiAbigen::from_json_files("./abi").unwrap();
     /// # }
     /// ```
+    #[cfg(feature = "fs")]
     pub fn from_json_files(root: impl AsRef<Path>) -> Result<Self> {
         let root = root.as_ref();
         let files = util::json_files(root);
@@ -1210,6 +1211,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "fs")]
     fn can_deduplicate_types() {
         let root = tempfile::tempdir().unwrap();
         let json_files = "../tests/solidity-contracts/greeter";
@@ -1255,6 +1257,7 @@ mod tests {
     }
 
     #[test]
+    #[cfg(feature = "fs")]
     fn can_sanitize_reserved_words() {
         let root = tempfile::tempdir().unwrap();
         let json_files = "../tests/solidity-contracts/ReservedWords";

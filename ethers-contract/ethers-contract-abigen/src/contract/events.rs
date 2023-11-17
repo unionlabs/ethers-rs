@@ -227,6 +227,7 @@ pub(crate) fn event_struct_alias(event_name: &str) -> Ident {
 }
 
 #[cfg(test)]
+#[cfg(feature = "fs")]
 mod tests {
     use super::*;
     use crate::Abigen;

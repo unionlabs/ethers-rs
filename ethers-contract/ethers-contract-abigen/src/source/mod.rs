@@ -20,6 +20,7 @@ pub enum Source {
     String(String),
 
     /// An ABI located on the local file system.
+    #[cfg(feature = "fs")]
     Local(PathBuf),
 
     /// An address of a smart contract address verified at a supported blockchain explorer.
@@ -83,8 +84,11 @@ impl Source {
         match source.chars().next() {
             Some('[' | '{') => Ok(Self::String(source.to_string())),
 
-            #[cfg(any(not(feature = "online"), target_arch = "wasm32"))]
+            #[cfg(all(feature = "fs", any(not(feature = "online"), target_arch = "wasm32")))]
             _ => Ok(Self::local(source)?),
+
+            #[cfg(not(all(feature = "fs", any(not(feature = "online"), target_arch = "wasm32"))))]
+            _ => Err(eyre::eyre!("unable to parse as abi source")),
 
             #[cfg(all(feature = "online", not(target_arch = "wasm32")))]
             Some('/') => Self::local(source),
@@ -94,6 +98,7 @@ impl Source {
     }
 
     /// Creates a local filesystem source from a path string.
+    #[cfg(feature = "fs")]
     pub fn local(path: impl AsRef<str>) -> Result<Self> {
         // resolve env vars
         let path = path.as_ref().trim_start_matches("file://");
@@ -139,11 +144,13 @@ impl Source {
     }
 
     /// Returns `true` if `self` is `Local`.
+    #[cfg(feature = "fs")]
     pub fn is_local(&self) -> bool {
         matches!(self, Self::Local(_))
     }
 
     /// Returns `self` as `Local`.
+    #[cfg(feature = "fs")]
     pub fn as_local(&self) -> Option<&PathBuf> {
         match self {
             Self::Local(p) => Some(p),
@@ -155,6 +162,7 @@ impl Source {
     /// system or retrieve a contract ABI from the network depending on the source type.
     pub fn get(&self) -> Result<String> {
         match self {
+            #[cfg(feature = "fs")]
             Self::Local(path) => Ok(fs::read_to_string(path)?),
             Self::String(abi) => Ok(abi.clone()),
 
@@ -170,6 +178,7 @@ mod tests {
     use std::path::Path;
 
     #[test]
+    #[cfg(feature = "fs")]
     fn parse_source() {
         let rel = "../tests/solidity-contracts/console.json";
         let abs = concat!(env!("CARGO_MANIFEST_DIR"), "/../tests/solidity-contracts/console.json");
