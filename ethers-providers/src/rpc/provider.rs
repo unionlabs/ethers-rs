@@ -1762,6 +1762,24 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn blob_versioned_hash() {
+        let provider = Provider::<Http>::try_from("https://sepolia.drpc.org").unwrap();
+
+        let tx = provider
+            .get_transaction(TxHash(
+                hex::decode("681fcce70edd1f36e0a83150f31f1a690fb36bc34797f244c36cf9fcaf738ff3")
+                    .unwrap()
+                    .try_into()
+                    .unwrap(),
+            ))
+            .await
+            .unwrap()
+            .unwrap();
+
+        dbg!(tx).blob_versioned_hashes.unwrap();
+    }
+
+    #[tokio::test]
     #[cfg_attr(feature = "celo", ignore)]
     async fn fee_history() {
         let provider = Provider::<Http>::try_from(

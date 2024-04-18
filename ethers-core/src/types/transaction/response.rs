@@ -131,6 +131,9 @@ pub struct Transaction {
     #[serde(rename = "chainId", default, skip_serializing_if = "Option::is_none")]
     pub chain_id: Option<U256>,
 
+    #[serde(rename = "blobVersionedHashes", default, skip_serializing_if = "Option::is_none")]
+    pub blob_versioned_hashes: Option<Vec<H256>>,
+
     /// Captures unknown fields such as additional fields used by L2s
     #[cfg(not(any(feature = "celo", feature = "optimism")))]
     #[serde(flatten)]
