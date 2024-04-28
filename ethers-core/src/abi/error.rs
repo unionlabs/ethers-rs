@@ -55,6 +55,37 @@ pub enum AbiError {
     ParseBytesError(#[from] ParseBytesError),
 }
 
+impl PartialEq for AbiError {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (AbiError::DecodingError(this), AbiError::DecodingError(other)) => {
+                match (this, other) {
+                    (ethabi::Error::InvalidName(this), ethabi::Error::InvalidName(other)) => {
+                        this == other
+                    }
+                    (ethabi::Error::InvalidData, ethabi::Error::InvalidData) => true,
+                    #[cfg(feature = "std")]
+                    (ethabi::Error::SerdeJson(this), ethabi::Error::SerdeJson(other)) => {
+                        this.to_string() == other.to_string()
+                    }
+                    (ethabi::Error::ParseInt(this), ethabi::Error::ParseInt(other)) => {
+                        this == other
+                    }
+                    (ethabi::Error::Hex(this), ethabi::Error::Hex(other)) => this == other,
+                    (ethabi::Error::Other(this), ethabi::Error::Other(other)) => this == other,
+                    _ => false,
+                }
+            }
+            (AbiError::DetokenizationError(this), AbiError::DetokenizationError(other)) => {
+                this == other
+            }
+            (AbiError::WrongSelector, AbiError::WrongSelector) => todo!(),
+            (AbiError::ParseBytesError(this), AbiError::ParseBytesError(other)) => this == other,
+            _ => false,
+        }
+    }
+}
+
 impl From<ethabi::Error> for AbiError {
     fn from(value: ethabi::Error) -> Self {
         Self::DecodingError(value)

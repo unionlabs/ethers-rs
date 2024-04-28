@@ -203,7 +203,7 @@ impl Decodable for Bytes {
     }
 }
 
-#[derive(Debug, Clone, Error)]
+#[derive(Debug, Clone, Error, PartialEq)]
 #[error("Failed to parse bytes: {0}")]
 pub struct ParseBytesError(hex::FromHexError);
 

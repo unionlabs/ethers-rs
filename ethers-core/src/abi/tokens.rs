@@ -9,7 +9,7 @@ use crate::{
 use arrayvec::ArrayVec;
 use thiserror::Error;
 
-#[derive(Clone, Debug, Error)]
+#[derive(Clone, Debug, Error, PartialEq)]
 #[error("{0}")]
 pub struct InvalidOutputType(pub String);
 
